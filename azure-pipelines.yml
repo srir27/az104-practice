@@ -36,6 +36,18 @@ stages:
             inputs:
               provider: 'azurerm'
               command: 'plan'
+              commandOptions: '-out=$(System.DefaultWorkingDirectory)/planfolder/tfplan'
               environmentServiceNameAzureRM: 'az104-practice'
-              
+          - task: TerraformTask@5
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              workingDirectory: 'terraform'
+              commandOptions: '-out=tfplan'
+              environmentServiceNameAzureRM: 'az104-practice'
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: 'terraform/tfplan' #Publishing only the tfplan binary file
+              artifact: 'tfplan'
+              publishLocation: 'pipeline'
           
