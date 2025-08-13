@@ -42,7 +42,7 @@ stages:
               commandOptions: '-out=tfplan' #Generate tfplan file
               environmentServiceNameAzureRM: 'az104-practice'
 
-          # Publishing the tfplan file
+          # Publishing the entire working directory
           - publish: $(System.DefaultWorkingDirectory)
             artifact: tfplan-artifacts
 
@@ -65,7 +65,7 @@ stages:
                   inputs:
                     terraformVersion: 'latest'
                 
-                # Downloading the tfplan file
+                # Downloading the tfplan-artifacts file into $(Pipeline.Workspace)
                 - download: current
                   artifact: tfplan-artifacts
                 - task: TerraformTask@5
@@ -73,6 +73,7 @@ stages:
                   inputs:
                     provider: 'azurerm'
                     command: 'apply'
-                    commandOptions: '--auto-approve tfplan'
+                    workingDirectory: '$(Pipeline.Workspace)/tf-artifacts' ##
+                    commandOptions: 'tfplan --auto-approve'
                     environmentServiceNameAzureRM: 'az104-practice'
 
