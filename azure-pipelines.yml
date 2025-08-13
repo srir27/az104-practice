@@ -68,7 +68,7 @@ stages:
                 # Downloading the tfplan-artifacts file into $(Pipeline.Workspace)
                 - download: current
                   artifact: tfplan-artifacts
-                - script: terraform apply tfplan --auto-approve
+                - script: terraform apply --auto-approve tfplan
                   displayName: Apply
                   workingDirectory: '$(Pipeline.Workspace)/tfplan-artifacts' ##
 
