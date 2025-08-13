@@ -95,4 +95,5 @@ stages:
                     workingDirectory: '$(Pipeline.Workspace)/terraform-plan'
                     commandOptions: 'tfplan'
                     environmentServiceNameAzureRM: 'az104-practice'
+                    backendServiceArm: 'az104-practice'
 
