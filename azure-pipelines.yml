@@ -12,6 +12,7 @@ pool:
 variables:
   - group: backendconfigs
 
+
 stages:
   - stage: PlanStage
     jobs:
@@ -32,12 +33,6 @@ stages:
               backendAzureRmContainerName: $(container)
               backendAzureRmKey: $(key)
               backendAzureRmUseCliFlagsForAuthentication: false
-          - task: TerraformTask@5
-            inputs:
-              provider: 'azurerm'
-              command: 'plan'
-              commandOptions: '-out=$(System.DefaultWorkingDirectory)/planfolder/tfplan'
-              environmentServiceNameAzureRM: 'az104-practice'
           - task: TerraformTask@5
             inputs:
               provider: 'azurerm'
