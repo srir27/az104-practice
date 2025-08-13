@@ -1,7 +1,4 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+---
 
 trigger:
 - main
@@ -17,12 +14,13 @@ stages:
   - stage: PlanStage
     jobs:
       - job: TerraformInstall
-        displayName: Installing terraform in the agent
         steps:
           - task: TerraformInstaller@1
+            displayName: Install
             inputs:
               terraformVersion: 'latest'
           - task: TerraformTask@5
+            displayName: Init
             inputs:
               provider: 'azurerm'
               command: 'init'
@@ -34,15 +32,17 @@ stages:
               backendAzureRmKey: $(key)
               backendAzureRmUseCliFlagsForAuthentication: false
           - task: TerraformTask@5
+            displayName: Plan
             inputs:
               provider: 'azurerm'
               command: 'plan'
-              workingDirectory: 'terraform'
-              commandOptions: '-out=tfplan'
+              workingDirectory: $(System.DefaultWorkingDirectory)
+              commandOptions: '-out=$(System.DefaultWorkingDirectory)/tfplan' #Generate tfplan file
               environmentServiceNameAzureRM: 'az104-practice'
           - task: PublishPipelineArtifact@1
+            displayName: Publish
             inputs:
-              targetPath: 'terraform/tfplan' #Publishing only the tfplan binary file
+              targetPath: '$(System.DefaultWorkingDirectory)/tfplan' #Publishing only the tfplan binary file
               artifact: 'tfplan'
               publishLocation: 'pipeline'
           
