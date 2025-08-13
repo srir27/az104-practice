@@ -68,7 +68,12 @@ stages:
                 # Downloading the tfplan-artifacts file into $(Pipeline.Workspace)
                 - download: current
                   artifact: tfplan-artifacts
-                - script: terraform apply --auto-approve tfplan
+                - task: TerraformTask@5  # Use the TerraformTask here
                   displayName: Apply
-                  workingDirectory: '$(Pipeline.Workspace)/tfplan-artifacts' ##
+                  inputs:
+                    provider: 'azurerm'
+                    command: 'apply'
+                    workingDirectory: '$(Pipeline.Workspace)/tfplan-artifacts'
+                    commandOptions: '--auto-approve tfplan'
+                    environmentServiceNameAzureRM: 'az104-practice'
 
