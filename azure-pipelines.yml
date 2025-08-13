@@ -42,9 +42,9 @@ stages:
               commandOptions: '-out=tfplan' #Generate tfplan file
               environmentServiceNameAzureRM: 'az104-practice'
 
-          #Publishing the tfplan file
-          - publish: tfplan
-            artifact: tfplan
+          # Publishing the tfplan file
+          - publish: $(System.DefaultWorkingDirectory)
+            artifact: tfplan-artifacts
 
 ##########################################
 ###         STAGE 2: APPLY             ###
@@ -53,9 +53,9 @@ stages:
     dependsOn: PlanStage
     condition: succeeded()
     jobs:
-      - deployment: ManualApproval # This job name is more descriptive.
+      - deployment: ManualApproval 
         displayName: TerraformApply
-        environment: approval-env # This line links the job to the environment and its checks.
+        environment: approval-env # Environment that is created in UI
         strategy:
           runOnce:
             deploy:
@@ -65,9 +65,9 @@ stages:
                   inputs:
                     terraformVersion: 'latest'
                 
-                #Downloading the tfplan file
+                # Downloading the tfplan file
                 - download: current
-                  artifact: tfplan
+                  artifact: tfplan-artifacts
                 - task: TerraformTask@5
                   displayName: Apply
                   inputs:
