@@ -73,6 +73,6 @@ stages:
                   inputs:
                     provider: 'azurerm'
                     command: 'apply'
-                    commandOptions: '--auto-approve $(Pipeline.Workspace)/tfplan/tfplan'
+                    commandOptions: '--auto-approve tfplan'
                     environmentServiceNameAzureRM: 'az104-practice'
 
