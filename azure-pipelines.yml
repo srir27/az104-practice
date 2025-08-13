@@ -1,7 +1,4 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+---
 
 trigger:
 - main
@@ -13,15 +10,19 @@ variables:
   - group: backendconfigs
 
 stages:
+##########################################
+###         STAGE 1: PLAN             ###
+##########################################
   - stage: PlanStage
     jobs:
-      - job: TerraformInstall
-        displayName: Installing terraform in the agent
+      - job: TerraformPlan
         steps:
           - task: TerraformInstaller@1
+            displayName: Install
             inputs:
               terraformVersion: 'latest'
           - task: TerraformTask@5
+            displayName: Init
             inputs:
               provider: 'azurerm'
               command: 'init'
@@ -33,9 +34,46 @@ stages:
               backendAzureRmKey: $(key)
               backendAzureRmUseCliFlagsForAuthentication: false
           - task: TerraformTask@5
+            displayName: Plan
             inputs:
               provider: 'azurerm'
               command: 'plan'
+              workingDirectory: $(System.DefaultWorkingDirectory)
+              commandOptions: '-out=tfplan' #Generate tfplan file
               environmentServiceNameAzureRM: 'az104-practice'
-              
-          
+
+          # Publishing the entire working directory
+          - publish: $(System.DefaultWorkingDirectory)
+            artifact: tfplan-artifacts
+
+##########################################
+###         STAGE 2: APPLY             ###
+##########################################
+  - stage: ApplyStage
+    dependsOn: PlanStage
+    condition: succeeded()
+    jobs:
+      - deployment: ManualApproval 
+        displayName: TerraformApply
+        environment: approval-env # Environment that is created in UI
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: TerraformInstaller@1
+                  displayName: Install
+                  inputs:
+                    terraformVersion: 'latest'
+                
+                # Downloading the tfplan-artifacts file into $(Pipeline.Workspace)
+                - download: current
+                  artifact: tfplan-artifacts
+                - task: TerraformTask@5  # Use the TerraformTask here
+                  displayName: Apply
+                  inputs:
+                    provider: 'azurerm'
+                    command: 'apply'
+                    workingDirectory: '$(Pipeline.Workspace)/tfplan-artifacts'
+                    commandOptions: '--auto-approve tfplan'
+                    environmentServiceNameAzureRM: 'az104-practice'
+
