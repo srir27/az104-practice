@@ -54,7 +54,7 @@ stages:
     condition: succeeded()
     jobs:
       - deployment: ManualApproval # This job name is more descriptive.
-        displayName: ManualApproval
+        displayName: TerraformApply
         environment: approval-env # This line links the job to the environment and its checks.
         strategy:
           runOnce:
@@ -73,6 +73,6 @@ stages:
                   inputs:
                     provider: 'azurerm'
                     command: 'apply'
-                    commandOptions: '--auto-approve $(Pipeline.Workspace)/tfplan'
+                    commandOptions: '--auto-approve $(Pipeline.Workspace)/tfplan/tfplan'
                     environmentServiceNameAzureRM: 'az104-practice'
 
