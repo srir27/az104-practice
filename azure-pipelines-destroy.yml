@@ -7,7 +7,7 @@ variables:
   - group: backendconfigs
 
 jobs:
-  - job: TerraformInstall
+  - job: TerraformDestroy
     steps:
       - task: TerraformInstaller@1
         displayName: Install Terraform
@@ -26,6 +26,7 @@ jobs:
           backendAzureRmContainerName: $(container)
           backendAzureRmKey: $(key)
       - task: TerraformTask@5
+        displayName: Terraform Destroy
         inputs:
           provider: 'azurerm'
           command: 'destroy'
