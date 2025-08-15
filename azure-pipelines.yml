@@ -86,7 +86,9 @@ stages:
                     backendAzureRmStorageAccountName: $(storage_account)
                     backendAzureRmContainerName: $(container)
                     backendAzureRmKey: $(key)
-                
+                - script: |
+                    find .terraform -name "terraform-provider-azurerm*" -exec chmod +x {} \;
+                  workingDirectory: '$(Pipeline.Workspace)/terraform-plan'
                 - task: TerraformTaskV4@4
                   displayName: Terraform Apply
                   inputs:
