@@ -1,29 +1,27 @@
-terraform {
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 4.33.0"
-    }
-  }
-  required_version = ">= 1.12.0"
-  backend "azurerm" {
-  use_azuread_auth = false
-}
-}
-
-provider "azurerm" {
-  # Configuration options
-  features {
-    resource_group {
-      prevent_deletion_if_contains_resources = true
-    }
-
-  }
-  #subscription_id = var.subscription_id
-}
-
 resource "azurerm_resource_group" "rg" {
-  name     = "example-resources"
+  name     = "nikelandingpage-resources"
   location = "North Europe"
 }
 
+resource "azurerm_service_plan" "asp" {
+  name                = "artifact-service-plan"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  os_type             = "Linux"
+  sku_name            = "F1"
+
+}
+
+resource "azurerm_linux_web_app" "app" {
+  name                = "artifact-app"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_service_plan.rg.location
+  service_plan_id     = azurerm_service_plan.asp.id
+
+  site_config {
+    application_stack {
+      node_version = "18-lts"
+    }
+    always_on = false
+   }
+}
