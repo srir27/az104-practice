@@ -1,0 +1,55 @@
+trigger: none
+
+pool:
+  vmImage: ubuntu-latest
+  
+variables:
+  resourcegroupname: az-104-tfbcknd
+  storageaccount: randomazbckndstrge
+  container: statecontainer
+  key: terraform.tfstate
+  serviceconnection: randomtfazspn
+
+jobs:
+  - job: Infradeployment
+    displayName: Infra deployment thru TF
+    steps:
+      - task: TerraformInstaller@1
+        displayName: InstallTerraform
+        inputs:
+          terraformVersion: '1.12.0'
+      - task: TerraformTask@5
+        displayName: "Tf Init"
+        inputs:
+          provider: 'azurerm'
+          command: 'init'
+          backendServiceArm: 'randomtfazspn'
+          backendAzureRmResourceGroupName: '$(resourcegroupname)'
+          backendAzureRmStorageAccountName: '$(storageaccount)'
+          backendAzureRmContainerName: '$(container)'
+          backendAzureRmKey: '$(key)'
+      - task: DownloadSecureFile@1
+        displayName: "Downloading .tfvars"
+        name: tfvars
+        inputs:
+          secureFile: 'variables.tfvars'
+      # - task: TerraformTask@5
+      #   displayName: "Tf Plan"
+      #   inputs:
+      #     provider: 'azurerm'
+      #     command: 'plan'
+      #     commandOptions: '-var-file=$(tfvars.secureFilePath) -out=tfplan'
+      #     environmentServiceNameAzureRM: 'randomtfazspn'
+      - task: TerraformTask@5
+        displayName: "Tf Destroy"
+        inputs:
+          provider: 'azurerm'
+          command: 'destroy'
+          commandOptions: '-var-file=$(tfvars.secureFilePath)'
+          environmentServiceNameAzureRM: 'randomtfazspn'
+
+
+
+
+
+
