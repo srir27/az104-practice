@@ -1,0 +1,52 @@
+trigger: none
+
+pool:
+  vmImage: ubuntu-latest
+  
+variables:
+  resourcegroupname: az-104-tfbcknd
+  storageaccount: randomazbckndstrge
+  container: statecontainer
+  key: terraform.tfstate
+  serviceconnection: randomtfazspn
+
+jobs:
+  - job: Infradeployment
+    displayName: Infra deployment thru TF
+    steps:
+      - task: TerraformInstaller@1
+        inputs:
+          terraformVersion: '1.12.0'
+      - task: TerraformTask@5
+        inputs:
+          provider: 'azurerm'
+          command: 'init'
+          backendServiceArm: 'randomtfazspn'
+          backendAzureRmResourceGroupName: '$(resourcegroupname)'
+          backendAzureRmStorageAccountName: '$(randomazbckndstrge)'
+          backendAzureRmContainerName: '$(statecontainer)'
+          backendAzureRmKey: '$(key)'
+      - task: TerraformTask@5
+        inputs:
+          provider: 'azurerm'
+          command: 'validate'
+      - task: DownloadSecureFile@1
+        inputs:
+          secureFile: 'variables.tfvars'
+      - task: TerraformTask@5
+        inputs:
+          provider: 'azurerm'
+          command: 'plan'
+          commandOptions: '-var-file=$(Agent.TempDirectory)/terraform.tfvars -out=tfplan'
+          environmentServiceNameAzureRM: 'randomtfazspn'
+      - task: TerraformTask@5
+        inputs:
+          provider: 'azurerm'
+          command: 'apply'
+          commandOptions: 'tfplan'
+          environmentServiceNameAzureRM: 'randomtfazspn'
+
+
+
+
+
