@@ -15,9 +15,11 @@ jobs:
     displayName: Infra deployment thru TF
     steps:
       - task: TerraformInstaller@1
+        displayName: InstallTerraform
         inputs:
           terraformVersion: '1.12.0'
       - task: TerraformTask@5
+        displayName: "Tf Init"
         inputs:
           provider: 'azurerm'
           command: 'init'
@@ -27,19 +29,23 @@ jobs:
           backendAzureRmContainerName: '$(statecontainer)'
           backendAzureRmKey: '$(key)'
       - task: TerraformTask@5
+        displayName: "Tf Validate"
         inputs:
           provider: 'azurerm'
           command: 'validate'
       - task: DownloadSecureFile@1
+        displayName: "Downloading .tfvars"
         inputs:
           secureFile: 'variables.tfvars'
       - task: TerraformTask@5
+        displayName: "Tf Plan"
         inputs:
           provider: 'azurerm'
           command: 'plan'
           commandOptions: '-var-file=$(Agent.TempDirectory)/terraform.tfvars -out=tfplan'
           environmentServiceNameAzureRM: 'randomtfazspn'
       - task: TerraformTask@5
+        displayName: "Tf Apply"
         inputs:
           provider: 'azurerm'
           command: 'apply'
