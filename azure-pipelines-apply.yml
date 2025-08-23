@@ -35,6 +35,7 @@ jobs:
           command: 'validate'
       - task: DownloadSecureFile@1
         displayName: "Downloading .tfvars"
+        name: tfvars
         inputs:
           secureFile: 'variables.tfvars'
       - task: TerraformTask@5
@@ -42,7 +43,7 @@ jobs:
         inputs:
           provider: 'azurerm'
           command: 'plan'
-          commandOptions: '-var-file=$(Agent.TempDirectory)/terraform.tfvars -out=tfplan'
+          commandOptions: '-var-file=$(tfvars.secureFilePath) -out=tfplan'
           environmentServiceNameAzureRM: 'randomtfazspn'
       - task: TerraformTask@5
         displayName: "Tf Apply"
@@ -51,6 +52,7 @@ jobs:
           command: 'apply'
           commandOptions: 'tfplan'
           environmentServiceNameAzureRM: 'randomtfazspn'
+
 
 
 
