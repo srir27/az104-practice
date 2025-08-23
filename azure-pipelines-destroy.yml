@@ -11,8 +11,8 @@ variables:
   serviceconnection: randomtfazspn
 
 jobs:
-  - job: Infradeployment
-    displayName: Infra deployment thru TF
+  - job: Infradestroy
+    displayName: Infra destroy thru TF
     steps:
       - task: TerraformInstaller@1
         displayName: InstallTerraform
