@@ -25,7 +25,7 @@ jobs:
           command: 'init'
           backendServiceArm: 'randomtfazspn'
           backendAzureRmResourceGroupName: '$(resourcegroupname)'
-          backendAzureRmStorageAccountName: '$(randomazbckndstrge)'
+          backendAzureRmStorageAccountName: '$(storageaccount)'
           backendAzureRmContainerName: '$(statecontainer)'
           backendAzureRmKey: '$(key)'
       - task: TerraformTask@5
